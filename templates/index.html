@@ -73,11 +73,15 @@
 
         // Mapping of Spanish Fuel names to English equivalents
         const FuelMapping = {
-            "Gasolina": "Gasoline",  // Adjusted for English display
-            "Eléctrico": "Electric", // Adjusted for English display
-            "Diésel": "Diesel",      // Added diesel in English
-            "Híbrido Gasolina": "Petrol Hybrid" // Added petrol hybrid in English
+            "Gasolina": "Gasoline",           // Adjusted for English display
+            "Eléctrico": "Electric",          // Adjusted for English display
+            "Diésel": "Diesel",               // Added Diesel in English
+            "Híbrido Gasolina": "Petrol Hybrid", // Added Petrol Hybrid in English
+            "GNC": "CNG",                     // Added Compressed Natural Gas in English
+            "Híbrido Diésel": "Diesel Hybrid", // Added Diesel Hybrid in English
+            "Gasolina/Etanol": "Gasoline/Ethanol" // Added Gasoline/Ethanol in English
         };
+
 
 
         // Mapping of Spanish Transmission names to English equivalents
@@ -100,6 +104,7 @@
         $('.reset').click(function() {
             resetDropdowns();
             document.getElementById("predictionResult").textContent = "";
+            $('#additionalInfo').remove(); // This line removes the <p> element
         });
 
         // Set max date for matriculacion input to today's date
