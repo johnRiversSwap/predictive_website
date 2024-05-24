@@ -8,71 +8,74 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f3f3f3;
-            margin: 0;
-            padding: 0;
-        }
-        
-        .container {
-            width: 80%;
-            margin: auto;
-        }
-        
-        h1 {
             text-align: center;
+            background-color: #f4f4f4;
+            color: #333;
         }
-        
+        h1 {
+            margin-top: 50px;
+            font-size: 36px;
+        }
         form {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+            display: inline-block;
+            text-align: left;
         }
-        
-        .row {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        form > div {
             margin-bottom: 10px;
         }
-        
-        .column {
-            margin: 5px;
-        }
-        
-        label {
-            font-weight: bold;
-        }
-        
-        button[type="submit"] {
+        button {
+            margin-top: 20px;
             padding: 10px 20px;
-            background-color: #FF5733; /* Red color */
-            color: white;
+            font-size: 16px;
+            background-color: #007bff;
+            color: #fff;
             border: none;
-            border-radius: 5px;
             cursor: pointer;
         }
-        
-        button[type="submit"]:hover {
-            background-color: #FF704D; /* Darker red color on hover */
+        button.reset {
+            background-color: #dc3545;
         }
-        
         #predictionResult {
-            font-weight: bold;
-            font-size: 18px;
-        }
-        
-        /* Increase space to the right of inputs */
-        input {
-            margin-right: 10px;
-        }
-        </style>
+    display: block;
+    min-width: 200px; /* Set a minimum width */
+    margin-top: 20px;
+    padding: 10px;
+    font-size: 20px;
+    background-color: #28a745;
+    color: #fff;
+    white-space: nowrap; /* Prevent text from wrapping */
+}
+
+
+    </style>
         
     <script>
     $(document).ready(function() {
         
         // variable vendedor always set to particular
         var vendedor = 'particular'; 
+
+        // Disable submit button initially
+        $('button[type="submit"]').prop('disabled', true);
+
+        // Enable submit button when potencia dropdown is selected
+        $('#potencia').change(function() {
+                $('button[type="submit"]').prop('disabled', false);
+            });
+        // Reset all dropdowns and input values
+        $('.reset').click(function() {
+            resetDropdowns();
+            document.getElementById("predictionResult").textContent = "";
+        });
+
+        // Set max date for matriculacion input to today's date
+        var today = new Date();
+            var yyyy = today.getFullYear();
+            var mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+            var maxDate = yyyy + '-' + mm;
+            $('#matriculacion').attr('max', maxDate); 
+
 
         // Initialize all dropdowns as disabled except 'make'
         $('#model, #combustible, #plazas, #cambio, #potencia, #color, #kms, #matriculacion, #consumoMixto, #speed, #altura, #anchura, #autonomia, #carroceria, #cilindrada, #consumoExtraurbano, #consumoUrbano, #deposito, #emisiones, #longitud, #maletero, #marchas, #par, #peso, #puertas, #traccion, #transmision, #velocidad').prop('disabled', true);
@@ -417,8 +420,10 @@
                 // Inside the success function of the AJAX request
                 success: function(response) {
                     console.log(response); // Log response from the server
-                    $('#predictionResult').text('Predicted Value: ' + response.prediction);
+                    var roundedPrediction = parseFloat(response.prediction).toFixed(2); // Round to 2 decimal places
+                    $('#predictionResult').text('Current Value*: ' + roundedPrediction + '€');
                 },
+
 
                 error: function(error) {
                     console.error("Error on prediction:", error);
@@ -430,69 +435,68 @@
     </script>
 </head>
 <body>
-    <div class="container">
-        <h1>How Much Is My Car Worth?</h1>
-        <form id="carForm">
-            <div class="row">
-                <div class="column">
-                    <label for="make">Make:</label>
-                    <select id="make" name="make"><option>Select Make</option></select>
-                    <label for="model">Model:</label>
-                    <select id="model"><option>Select Model</option></select>
-                    <label for="combustible">Combustible:</label>
-                    <select id="combustible"><option>Select Combustible</option></select>
-                    <label for="plazas">Plazas:</label>
-                    <select id="plazas"><option>Select Plazas</option></select>
-                    <label for="cambio">Cambio:</label>
-                    <select id="cambio"><option>Select Cambio</option></select>
-                </div>
-            </div>
-            <div class="row">
-                <div class="column">
-                    <label for="potencia">Potencia:</label>
-                    <select id="potencia"><option>Select Potencia</option></select>
-                    <label for="color">Color:</label>
-                    <select id="color" disabled><option>Select Color</option></select>
-                    <label for="kms">Kms:</label>
-                    <input type="number" id="kms" min="0" max="2000000" disabled>
-                    <label for="matriculacion">Matriculación:</label>
-                    <input type="month" id="matriculacion" disabled>
-                </div>
-            </div>
+    <h1>How Much Is My Car Worth?</h1>
+    <form>
+        <div>
+            <label for="make">Make:</label>
+            <select id="make"><option>Select Make</option></select>
+        </div>
+        <div>
+            <label for="model">Model:</label>
+            <select id="model"><option>Select Model</option></select>
+        </div>
+        <div>
+            <label for="combustible">Combustible:</label>
+            <select id="combustible"><option>Select Combustible</option></select>
+        </div>
+        <div>
+            <label for="plazas">Plazas:</label>
+            <select id="plazas"><option>Select Plazas</option></select>
+        </div>
+        <div>
+            <label for="cambio">Cambio:</label>
+            <select id="cambio"><option>Select Cambio</option></select>
+        </div>
+        <div>
+            <label for="potencia">Potencia:</label>
+            <select id="potencia"><option>Select Potencia</option></select>
+        </div>
+        <div>
+            <label for="color">Color:</label>
+            <select id="color" disabled><option>Select Color</option></select>
+        </div>
+        <div>
+            <label for="kms">Kms:</label>
+            <input type="number" id="kms" min="0" max="2000000" disabled>
+        </div>
+        <div>
+            <label for="matriculacion">Matriculación:</label>
+            <input type="month" id="matriculacion" disabled>
+        </div>
+        <!-- Hidden fields -->
+        <input type="hidden" id="consumoMixto" name="Consumo mixto (L)">
+        <input type="hidden" id="speed" name="0-100 km/h (s)">
+        <input type="hidden" id="altura" name="Altura (cm)">
+        <input type="hidden" id="anchura" name="Anchura (cm)">
+        <input type="hidden" id="autonomia" name="Autonomía">
+        <input type="hidden" id="carroceria" name="Carrocería">
+        <input type="hidden" id="cilindrada" name="Cilindrada (cm3)">
+        <input type="hidden" id="consumoExtraurbano" name="Consumo extraurbano (L)">
+        <input type="hidden" id="consumoUrbano" name="Consumo urbano (L)">
+        <input type="hidden" id="deposito" name="Depósito (L)">
+        <input type="hidden" id="emisiones" name="Emisiones de CO2 (gr/m3)">
+        <input type="hidden" id="longitud" name="Longitud (cm)">
+        <input type="hidden" id="maletero" name="Maletero (L)">
+        <input type="hidden" id="marchas" name="Marchas">
+        <input type="hidden" id="par" name="Par máximo (nm)">
+        <input type="hidden" id="peso" name="Peso máximo (kg)">
+        <input type="hidden" id="puertas" name="Puertas (puertas)">
+        <input type="hidden" id="traccion" name="Tracción">
+        <input type="hidden" id="transmision" name="Transmisión">
+        <input type="hidden" id="velocidad" name="Velocidad máxima (km/h)">
 
-            <!-- Hidden fields -->
-            <input type="hidden" id="consumoMixto" name="Consumo mixto (L)">
-            <input type="hidden" id="speed" name="0-100 km/h (s)">
-            <input type="hidden" id="altura" name="Altura (cm)">
-            <input type="hidden" id="anchura" name="Anchura (cm)">
-            <input type="hidden" id="autonomia" name="Autonomía">
-            <input type="hidden" id="carroceria" name="Carrocería">
-            <input type="hidden" id="cilindrada" name="Cilindrada (cm3)">
-            <input type="hidden" id="consumoExtraurbano" name="Consumo extraurbano (L)">
-            <input type="hidden" id="consumoUrbano" name="Consumo urbano (L)">
-            <input type="hidden" id="deposito" name="Depósito (L)">
-            <input type="hidden" id="emisiones" name="Emisiones de CO2 (gr/m3)">
-            <input type="hidden" id="longitud" name="Longitud (cm)">
-            <input type="hidden" id="maletero" name="Maletero (L)">
-            <input type="hidden" id="marchas" name="Marchas">
-            <input type="hidden" id="par" name="Par máximo (nm)">
-            <input type="hidden" id="peso" name="Peso máximo (kg)">
-            <input type="hidden" id="puertas" name="Puertas (puertas)">
-            <input type="hidden" id="traccion" name="Tracción">
-            <input type="hidden" id="transmision" name="Transmisión">
-            <input type="hidden" id="velocidad" name="Velocidad máxima (km/h)">
-
-            <div class="row">
-                <div class="column">
-                    <button type="submit">Submit</button>
-                    <button type="button" id="resetButton">Reset</button>
-                </div>
-            </div>
-            <div class="row">
-                <div class="column">
-                    <span id="predictionResult">Value of my car: €</span>
-                </div>
-            </div>
-        </form>
-    </div>
+        <button type="submit">Submit</button>
+        <button type="button" class="reset">Reset</button>
+    </form>
+    <span id="predictionResult"></span>
 </body>
