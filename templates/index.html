@@ -13,16 +13,16 @@
             color: #333;
         }
         h1 {
-            margin-top: 50px;
-            font-size: 36px;
+            margin-top: 25px;
+            font-size: 30px;
         }
         form {
-            margin-top: 30px;
+            margin-top: 5px;
             display: inline-block;
             text-align: left;
         }
         form > div {
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
         button {
             margin-top: 20px;
@@ -37,21 +37,54 @@
             background-color: #dc3545;
         }
         #predictionResult {
-    display: block;
-    min-width: 200px; /* Set a minimum width */
-    margin-top: 20px;
-    padding: 10px;
-    font-size: 20px;
-    background-color: #28a745;
-    color: #fff;
-    white-space: nowrap; /* Prevent text from wrapping */
-}
-
+            display: block;
+            min-width: 200px; /* Set a minimum width */
+            margin-top: 20px;
+            padding: 10px;
+            font-size: 20px;
+            background-color: #28a745;
+            color: #fff;
+            white-space: nowrap; /* Prevent text from wrapping */
+        }
+        #additionalInfo {
+            margin-top: 15px;
+            font-size: 12px;
+        }
 
     </style>
         
     <script>
     $(document).ready(function() {
+
+        // Mapping of Spanish color names to English equivalents
+        const colorMapping = {
+            "Blanco": "White",
+            "Negro": "Black",
+            "Azul": "Blue",
+            "Otro": "Other",
+            "Rojo": "Red",
+            "Verde": "Green",
+            "Gris": "Gray",
+            "Amarillo": "Yellow",
+            "Marrón": "Brown",
+            "Beige": "Beige",
+            "Naranja": "Orange"
+        };
+
+        // Mapping of Spanish Fuel names to English equivalents
+        const FuelMapping = {
+            "Gasolina": "Gasoline",  // Adjusted for English display
+            "Eléctrico": "Electric", // Adjusted for English display
+            "Diésel": "Diesel",      // Added diesel in English
+            "Híbrido Gasolina": "Petrol Hybrid" // Added petrol hybrid in English
+        };
+
+
+        // Mapping of Spanish Transmission names to English equivalents
+        const TransmissionMapping = {
+            "Manual": "Manual",
+            "Automática" : "Automatic"
+        };
         
         // variable vendedor always set to particular
         var vendedor = 'particular'; 
@@ -111,8 +144,11 @@
             if (make && model) {
                 // Fetch and populate other attributes
                 $.getJSON(`/data/combustible_by_make_model`, function(data) {
-                    data[make_model].forEach(function(item) {
-                        $('#combustible').append($('<option>').text(item).attr('value', item));
+                    data[make_model].forEach(function(combustible) {
+                        // Translate Spanish color name to English using the mapping for display only
+                        const englishcombustible = FuelMapping[combustible];
+                        // Keep the actual value in Spanish
+                        $('#combustible').append($('<option>').text(englishcombustible).attr('value', combustible));
                     });
                 });
             }
@@ -139,7 +175,11 @@
                 // Fetch and populate cambio
                 $.getJSON(`/data/cambio_by_make_model_combustible`, function(data) {
                     data[make_model_combustible].forEach(function(cambio) {
-                        $('#cambio').append($('<option>').text(cambio).attr('value', cambio));
+                        // Translate Spanish color name to English using the mapping for display only
+                        const englishCambio = TransmissionMapping[cambio];
+                        // Keep the actual value in Spanish
+                        $('#cambio').append($('<option>').text(englishCambio).attr('value', cambio));
+                            
                     });
                 });
             }
@@ -184,9 +224,13 @@
                 // Fetch and populate color
                 $.getJSON(`/data/colors`, function(data) {
                     data.forEach(function(color) {
-                        $('#color').append($('<option>').text(color).attr('value', color));
+                        // Translate Spanish color name to English using the mapping for display only
+                        const englishColor = colorMapping[color];
+                        // Keep the actual value in Spanish
+                        $('#color').append($('<option>').text(englishColor).attr('value', color));
                     });
                 });
+
                 // Fetch and populate 0_100_kmh_s_by_make_model_combustible_plazas_cambio_potencia
                 $.getJSON(`/data/0_100_kmh_s_by_make_model_combustible_plazas_cambio_potencia`, function(data) {
                     var speed = data[make_model_combustible_plazas_cambio_potencia];
@@ -334,11 +378,11 @@
         function resetDropdowns() {
             // Function to clear and disable all dropdowns except make
             $('#model').empty().append($('<option>').text('Select Model').attr('value', '')).prop('disabled', true);
-            $('#combustible').empty().append($('<option>').text('Select Combustible').attr('value', '')).prop('disabled', true);
-            $('#plazas').empty().append($('<option>').text('Select Plazas').attr('value', '')).prop('disabled', true);
-            $('#cambio').empty().append($('<option>').text('Select Cambio').attr('value', '')).prop('disabled', true);
-            $('#potencia').empty().append($('<option>').text('Select Potencia').attr('value', '')).prop('disabled', true);
-            $('#color').empty().append($('<option>').text('Select color').attr('value', '')).prop('disabled', true);
+            $('#combustible').empty().append($('<option>').text('Select Fuel').attr('value', '')).prop('disabled', true);
+            $('#plazas').empty().append($('<option>').text('Select Seats').attr('value', '')).prop('disabled', true);
+            $('#cambio').empty().append($('<option>').text('Select Transmission').attr('value', '')).prop('disabled', true);
+            $('#potencia').empty().append($('<option>').text('Select Power').attr('value', '')).prop('disabled', true);
+            $('#color').empty().append($('<option>').text('Select Color').attr('value', '')).prop('disabled', true);
             $('#kms').val('');
             $('#matriculacion').val('');
             $('#speed').empty().append($('<option>').text('Select speed').attr('value', '')).prop('disabled', true);
@@ -421,7 +465,9 @@
                 success: function(response) {
                     console.log(response); // Log response from the server
                     var roundedPrediction = parseFloat(response.prediction).toFixed(2); // Round to 2 decimal places
-                    $('#predictionResult').text('Current Value*: ' + roundedPrediction + '€');
+                    $('#predictionResult').text('Current Value: ' + roundedPrediction + ' €');
+                    // Adding a <p> element below predictionResult with a different style
+                    $('#predictionResult').after('<p id="additionalInfo">*The values provided are based on Spanish market conditions as of May 2024.</p>');
                 },
 
 
@@ -446,31 +492,31 @@
             <select id="model"><option>Select Model</option></select>
         </div>
         <div>
-            <label for="combustible">Combustible:</label>
-            <select id="combustible"><option>Select Combustible</option></select>
+            <label for="combustible">Fuel:</label>
+            <select id="combustible"><option>Select Fuel</option></select>
         </div>
         <div>
-            <label for="plazas">Plazas:</label>
-            <select id="plazas"><option>Select Plazas</option></select>
+            <label for="plazas">Seats:</label>
+            <select id="plazas"><option>Select Seats</option></select>
         </div>
         <div>
-            <label for="cambio">Cambio:</label>
-            <select id="cambio"><option>Select Cambio</option></select>
+            <label for="cambio">Transmission:</label>
+            <select id="cambio"><option>Select Transmission</option></select>
         </div>
         <div>
-            <label for="potencia">Potencia:</label>
-            <select id="potencia"><option>Select Potencia</option></select>
+            <label for="potencia">Power (HP):</label>
+            <select id="potencia"><option>Select Power</option></select>
         </div>
         <div>
             <label for="color">Color:</label>
             <select id="color" disabled><option>Select Color</option></select>
         </div>
         <div>
-            <label for="kms">Kms:</label>
+            <label for="kms">Mileage (Km):</label>
             <input type="number" id="kms" min="0" max="2000000" disabled>
         </div>
         <div>
-            <label for="matriculacion">Matriculación:</label>
+            <label for="matriculacion">Registration Date:</label>
             <input type="month" id="matriculacion" disabled>
         </div>
         <!-- Hidden fields -->
